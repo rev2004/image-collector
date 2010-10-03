@@ -35,6 +35,11 @@ import javax.swing.GrayFilter;
 
 public class ImageUtils {
 
+	/**
+	 * Do what??
+	 * @param filename
+	 * @return
+	 */
 	public static BufferedImage load(String filename) {
 		File file = new File(filename);
 		BufferedImage bufferedImage = null;
