@@ -18,6 +18,22 @@ import org.neuroph.util.TransferFunctionType;
  */
 public class FaceClassify {
     private NeuralNetwork neuralNetwork;
+    
+    /**
+     * Ket qua mong muon xuat ra cho face
+     */
+    private double[] desireFaceOutput = new double[] {1};
+    
+    /**
+     * Ket qua mong muon xuat ra cho none face
+     */
+    private double[] desireNoneFaceOutput = new double[] {0};
+    
+    /**
+     * Luu du lieu cho viec train
+     */
+    private TrainingSet trainSet = new TrainingSet();
+    
 
     /**
      * Create Instance of faceclassify
@@ -33,20 +49,39 @@ public class FaceClassify {
     }
 
     /**
-     * Train the network for classify face and none face
-     * @param listOfImage List of face image to train
-     * @param listOfDesireOutput list of desire image to train
+     * Train cho neural network
      */
-    public void train(List<double[]> listOfImage, List<double[]> listOfDesireOutput) {
-        TrainingSet trainningSet = new TrainingSet();
-        int listCout = listOfImage.size();
-        for (int i = 0; i < listCout; i ++) {
-            SupervisedTrainingElement trainningElement =
-                    new SupervisedTrainingElement(listOfImage.get(i), listOfDesireOutput.get(i));
-            trainningSet.addElement(trainningElement);
-        }
-        neuralNetwork.learnInSameThread(trainningSet);
+    public void train() {
+        neuralNetwork.learnInSameThread(trainSet);
     }
+    
+    /**
+     * Nap vao cac face de train
+     * @param listFace Danh sach face can train
+     */
+    public void addFacesToTrain(List<double[]> listFace) {
+    	int listCount = listFace.size();
+    	for (int i = 0; i < listCount; i ++) {
+    		SupervisedTrainingElement trainingElement = 
+    			new SupervisedTrainingElement(listFace.get(i), desireFaceOutput);
+    		trainSet.addElement(trainingElement);
+    	}
+    	
+    }
+    
+    /**
+     * Nap vao none face de train
+     * @param listNoneFace Danh sach none face can nap
+     */
+    public void addNoneFace(List<double[]> listNoneFace) {
+    	int listCount = listNoneFace.size();
+    	for (int i = 0; i < listCount; i ++) {
+    		SupervisedTrainingElement trainElement = 
+    			new SupervisedTrainingElement(listNoneFace.get(i), desireNoneFaceOutput);
+    		trainSet.addElement(trainElement);
+    	}
+    }
+    
 
     /**
      * Save network to file
@@ -77,5 +112,12 @@ public class FaceClassify {
             return false;
         }
         return true;
+    }
+    
+    /**
+     * Reset lai trang thai train set
+     */
+    public void resetTrainSet() {
+    	trainSet = new TrainingSet();
     }
 }
