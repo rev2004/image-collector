@@ -16,8 +16,10 @@ import org.neuroph.util.TransferFunctionType;
  * Classify 
  * @author MinhNhat
  */
-public class FaceClassify {
+public class FaceClassify extends Thread{
     private NeuralNetwork neuralNetwork;
+    
+    private Thread thread;
     
     /**
      * Ket qua mong muon xuat ra cho face
@@ -37,23 +39,28 @@ public class FaceClassify {
 
     /**
      * Create Instance of faceclassify
-     * @param inputNeural Number of neural in input player
-     * @param hiddenNeural Number of neural in hidden layer
-     * @param outputNeural Number of neural in output neural
      */
-    public FaceClassify(int inputNeural, int hiddenNeural, int outputNeural) {
+    public FaceClassify() {
         neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.TANH,
-                                                Const.NUMBER_OF_HIDDEN_NEURAL,
+                                                Const.NUMBER_OF_INPUT_NEURAL,
                                                 Const.NUMBER_OF_HIDDEN_NEURAL,
                                                 Const.NUMBER_OF_OUTPUT_NEURAL);
     }
 
+    @Override
+    public void run() {
+    	neuralNetwork.learnInSameThread(trainSet);
+    	System.out.println("Xong");
+    }
+    
     /**
-     * Train cho neural network
+     * Train cho neural network bỏ vào trong thread
      */
     public void train() {
-        neuralNetwork.learnInSameThread(trainSet);
+    	thread = new Thread(this);
+    	thread.start();
     }
+    
     
     /**
      * Nap vao cac face de train
