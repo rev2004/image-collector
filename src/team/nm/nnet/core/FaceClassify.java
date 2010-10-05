@@ -73,7 +73,7 @@ public class FaceClassify {
      * Nap vao none face de train
      * @param listNoneFace Danh sach none face can nap
      */
-    public void addNoneFace(List<double[]> listNoneFace) {
+    public void addNoneFaceToTrain(List<double[]> listNoneFace) {
     	int listCount = listNoneFace.size();
     	for (int i = 0; i < listCount; i ++) {
     		SupervisedTrainingElement trainElement = 
