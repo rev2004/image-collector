@@ -16,6 +16,7 @@ public class TestNeuralNetwork {
 	 */
 	public static void main(String[] args) {
 		String path = System.getProperty("user.dir");
+		String root = path;
 		path += "\\ref\\imageStore";
 		String pathFace = path + "\\faces";
 		String pathNonFace = path + "\\nonFaces";
@@ -31,8 +32,7 @@ public class TestNeuralNetwork {
 			System.out.println(str);
 		}
 		//--------------------------------------------
-		FaceClassify fc = new FaceClassify(Const.NUMBER_OF_INPUT_NEURAL, 
-				Const.NUMBER_OF_HIDDEN_NEURAL, Const.NUMBER_OF_OUTPUT_NEURAL);
+		FaceClassify fc = new FaceClassify();
 		List<double[]> listFaceTrain = new ArrayList<double[]>();
 		for (String str : listFace) {
 			BufferedImage bi = ImageUtils.load(pathFace + "\\" + str);
@@ -45,16 +45,17 @@ public class TestNeuralNetwork {
 		
 		List<double[]> listNonFaceTrain = new ArrayList<double[]>();
 		for (String str : listNonFace) {
-			BufferedImage bi = ImageUtils.load(pathFace + "\\" + str);
+			BufferedImage bi = ImageUtils.load(pathNonFace + "\\" + str);
 			bi = ImageUtils.grayScale(bi);
 			bi = ImageUtils.resize(bi, Const.FACE_WIDTH, Const.FACE_HEIGHT);
 			double[] inputArray = ImageUtils.toArray(bi);
 			listNonFaceTrain.add(inputArray);
 		}
-		fc.addNonFaceToTrain(listNonFaceTrain);
+		//fc.addNonFaceToTrain(listNonFaceTrain);
 		
 		fc.train();
-		fc.saveNetwork(path + "\\ref\\outputNetwork\\output.nnet");
+		fc.saveNetwork(root + "\\ref\\outputNetwork\\output.nnet");
+		
 		
 
 	}
