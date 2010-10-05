@@ -36,9 +36,9 @@ import javax.swing.GrayFilter;
 public class ImageUtils {
 
 	/**
-	 * Do what??
-	 * @param filename
-	 * @return
+	 * Load anh tra ve buffred image
+	 * @param filename Duong dan file anh
+	 * @return Ket qua load anh
 	 */
 	public static BufferedImage load(String filename) {
 		File file = new File(filename);
@@ -57,6 +57,13 @@ public class ImageUtils {
 		return bufferedImage;
 	}
 
+	/**
+	 * Resize anh
+	 * @param image Anh can resze
+	 * @param width Chieu rong can resize
+	 * @param height Chieu dai can resize
+	 * @return Anh sau khi resize
+	 */
 	public static BufferedImage resize(BufferedImage image, int width,
 			int height) {
 		int type = image.getType() != 0 ? image.getType() : 1;
@@ -79,6 +86,11 @@ public class ImageUtils {
 		return resizedImage;
 	}
 
+	/**
+	 * Save anh thanh file png
+	 * @param bufferedImage Anh can save
+	 * @param file Luon file de luu
+	 */
 	public static void saveToPng(BufferedImage bufferedImage, File file) {
 		try {
 			ImageIO.write(bufferedImage,"png",file);
@@ -174,6 +186,11 @@ public class ImageUtils {
 		return image;
 	}
 
+	/**
+	 * Chuyen anh anh anh xam
+	 * @param bufferedImage Anh can chuyen 
+	 * @return Ket qua chuyen
+	 */
 	public static BufferedImage grayScale(BufferedImage bufferedImage) {
 		ImageFilter filter = new GrayFilter(true, 50);
 		ImageProducer producer = new FilteredImageSource(
@@ -186,6 +203,11 @@ public class ImageUtils {
 		return grayScaleBuff;
 	}
 
+	/**
+	 * Chuyen image thanh array
+	 * @param bufferedImage Anh can chuyen thanh array
+	 * @return Ket qua chuyen
+	 */
 	public static double[] toArray(BufferedImage bufferedImage) {
 		int height = bufferedImage.getHeight(null);
 		int width = bufferedImage.getWidth(null);
@@ -231,6 +253,12 @@ public class ImageUtils {
 		return flipedBuff;
 	}
 	
+	/**
+	 * Xoay anh
+	 * @param bufferedImage Anh can xoay
+	 * @param angle Goc xoay (Tinh bang do)
+	 * @return Ket qua xoay
+	 */
 	public static BufferedImage rotate(BufferedImage bufferedImage, double angle) {
 		int width = bufferedImage.getWidth(null);
 		int height = bufferedImage.getHeight(null);

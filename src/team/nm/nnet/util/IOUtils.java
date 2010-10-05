@@ -6,6 +6,11 @@ import java.util.List;
 
 public class IOUtils {
 
+	/**
+	 * Lay cac file name trong thu muc
+	 * @param directoryPath Thu muc can lay
+	 * @return Danh sach file name
+	 */
     public static List<String> listFileName(String directoryPath) {        
         File dir = new File(directoryPath);
         File[] files = dir.listFiles();
