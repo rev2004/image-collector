@@ -3,13 +3,15 @@ package team.nm.nnet.app.imageCollector.test;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observer;
 
 import team.nm.nnet.core.Const;
+import team.nm.nnet.core.ControlFaceClassify;
 import team.nm.nnet.core.FaceClassify;
 import team.nm.nnet.util.IOUtils;
 import team.nm.nnet.util.ImageUtils;
 
-public class TestNeuralNetwork {
+public class TestNeuralNetwork{
 
 	/**
 	 * @param args
@@ -40,6 +42,7 @@ public class TestNeuralNetwork {
 			bi = ImageUtils.resize(bi, Const.FACE_WIDTH, Const.FACE_HEIGHT);
 			double[] inputArray = ImageUtils.toArray(bi);
 			listFaceTrain.add(inputArray);
+			
 		}
 		fc.addFacesToTrain(listFaceTrain);
 		
@@ -51,10 +54,12 @@ public class TestNeuralNetwork {
 			double[] inputArray = ImageUtils.toArray(bi);
 			listNonFaceTrain.add(inputArray);
 		}
-		//fc.addNonFaceToTrain(listNonFaceTrain);
+		fc.addNonFaceToTrain(listNonFaceTrain);
 		
-		fc.train();
-		fc.saveNetwork(root + "\\ref\\outputNetwork\\output.nnet");
+		
+		ControlFaceClassify cf = new ControlFaceClassify(fc, root + "\\ref\\outputNetwork\\output.nnet");
+		
+		
 		
 		
 
