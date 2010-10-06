@@ -11,12 +11,13 @@ import org.neuroph.core.learning.SupervisedTrainingElement;
 import org.neuroph.core.learning.TrainingSet;
 import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.util.TransferFunctionType;
+import java.util.Observable;
 
 /**
  * Classify 
  * @author MinhNhat
  */
-public class FaceClassify extends Thread{
+public class FaceClassify extends Observable implements Runnable{
     private NeuralNetwork neuralNetwork;
     
     private Thread thread;
@@ -51,6 +52,8 @@ public class FaceClassify extends Thread{
     public void run() {
     	neuralNetwork.learnInSameThread(trainSet);
     	System.out.println("Xong");
+    	setChanged();
+    	notifyObservers();
     }
     
     /**
