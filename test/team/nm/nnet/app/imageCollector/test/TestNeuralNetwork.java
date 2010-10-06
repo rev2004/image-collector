@@ -17,6 +17,9 @@ public class TestNeuralNetwork{
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		
+		System.out.println("Begin time: " + System.currentTimeMillis());
+		
 		String path = System.getProperty("user.dir");
 		String root = path;
 		path += "\\ref\\imageStore";
@@ -42,6 +45,7 @@ public class TestNeuralNetwork{
 			bi = ImageUtils.resize(bi, Const.FACE_WIDTH, Const.FACE_HEIGHT);
 			double[] inputArray = ImageUtils.toArray(bi);
 			listFaceTrain.add(inputArray);
+			System.out.println("Face " + str);
 			
 		}
 		fc.addFacesToTrain(listFaceTrain);
@@ -53,16 +57,14 @@ public class TestNeuralNetwork{
 			bi = ImageUtils.resize(bi, Const.FACE_WIDTH, Const.FACE_HEIGHT);
 			double[] inputArray = ImageUtils.toArray(bi);
 			listNonFaceTrain.add(inputArray);
+			System.out.println("Non-Face " + str);
 		}
 		fc.addNonFaceToTrain(listNonFaceTrain);
 		
 		
 		ControlFaceClassify cf = new ControlFaceClassify(fc, root + "\\ref\\outputNetwork\\output.nnet");
 		
-		
-		
-		
-
+		System.out.println("Finish time: " + System.currentTimeMillis());
 	}
 
 }
