@@ -7,7 +7,7 @@ import java.util.List;
 public class IOUtils {
 
 	/**
-	 * Lay cac file name trong thu muc
+	 * Lấy các file name trong thư mục
 	 * @param directoryPath Thu muc can lay
 	 * @return Danh sach file name
 	 */

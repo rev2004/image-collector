@@ -99,6 +99,8 @@ public class ImageUtils {
 		}
 	}
 	
+	
+	@SuppressWarnings("rawtypes")
 	public static void drawImageToJpgByteStream(BufferedImage bufferedImage,
 			Object stream) {
 		try {
@@ -120,6 +122,7 @@ public class ImageUtils {
 			e.printStackTrace();
 		}
 	}
+	
 
 	public static BufferedImage scale(BufferedImage image, int width, int height) {
 		int thumbWidth = width <= 0 ? 0x7fffffff : width;
@@ -139,6 +142,8 @@ public class ImageUtils {
 		return resize(image, thumbWidth, thumbHeight);
 	}
 
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static BufferedImage blurImage(BufferedImage image) {
 		float ninth = 0.1111111F;
 		float blurKernel[] = { ninth, ninth, ninth, ninth, ninth, ninth, ninth,
@@ -155,6 +160,7 @@ public class ImageUtils {
 				hints);
 		return op.filter(image, null);
 	}
+	
 
 	public static byte[] clippedAndScale(byte[] imageData, int frameSize) {
 		try {
