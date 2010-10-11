@@ -1,133 +1,108 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package team.nm.nnet.core;
 
+import java.awt.image.BufferedImage;
 import java.util.List;
-import org.neuroph.core.NeuralNetwork;
-import org.neuroph.core.learning.SupervisedTrainingElement;
-import org.neuroph.core.learning.TrainingSet;
-import org.neuroph.nnet.MultiLayerPerceptron;
-import org.neuroph.util.TransferFunctionType;
 import java.util.Observable;
 
-/**
- * Classify 
- * @author MinhNhat
- */
+import org.encog.neural.activation.ActivationSigmoid;
+import org.encog.neural.data.NeuralDataSet;
+import org.encog.neural.data.basic.BasicNeuralData;
+import org.encog.neural.data.basic.BasicNeuralDataSet;
+import org.encog.neural.networks.BasicNetwork;
+import org.encog.neural.networks.layers.BasicLayer;
+import org.encog.neural.networks.training.Train;
+import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation;
+
+import team.nm.nnet.util.IOUtils;
+import team.nm.nnet.util.ImageProcess;
+import team.nm.nnet.util.Matrix;
+
 public class FaceClassify extends Observable implements Runnable{
-    private NeuralNetwork neuralNetwork;
-    
-    private Thread thread;
-    
-    /**
-     * Ket qua mong muon xuat ra cho face
-     */
-    private double[] desireFaceOutput = new double[] {1};
-    
-    /**
-     * Ket qua mong muon xuat ra cho none face
-     */
-    private double[] desireNoneFaceOutput = new double[] {0};
-    
-    /**
-     * Luu du lieu cho viec train
-     */
-    private TrainingSet trainSet = new TrainingSet();
-    
 
-    /**
-     * Create Instance of faceclassify
-     */
-    public FaceClassify() {
-        neuralNetwork = new MultiLayerPerceptron(TransferFunctionType.TANH,
-                                                Const.NUMBER_OF_INPUT_NEURAL,
-                                                Const.NUMBER_OF_HIDDEN_NEURAL,
-                                                Const.NUMBER_OF_OUTPUT_NEURAL);
-    }
+	/**
+	 * Lưu network cua hệ thống
+	 */
+	private BasicNetwork network;
+	
+	/**
+	 * Lưu dữ liệu train cho network
+	 */
+	private NeuralDataSet dataSet;
+	
+	/**
+	 * Luu đối tượng train cho hệ thống
+	 */
+	private Train train;
+	
+	public FaceClassify() {
+		network = new BasicNetwork();
+		network.addLayer(new BasicLayer(new ActivationSigmoid(), false, Const.NUMBER_OF_INPUT_NEURAL));
+		network.addLayer(new BasicLayer(new ActivationSigmoid(), false, Const.NUMBER_OF_HIDDEN_NEURAL));
+		network.addLayer(new BasicLayer(new ActivationSigmoid(), false, Const.NUMBER_OF_OUTPUT_NEURAL));
+		network.getStructure().finalizeStructure();
+		network.reset();
+		
+		dataSet = new BasicNeuralDataSet();
+	}
+	
+	/**
+	 * Nạp vào thư mục chứa các ảnh la face
+	 * @param folder Đường dẫn đến thư mục
+	 */
+	public void addTrainFaceData(String folder) {
+		double[] ideal = {1};
+		List<String> listFilenames = IOUtils.listFileName(folder);
+		int listCount = listFilenames.size();
+		for (int i = 0; i < listCount; i ++) {
+			BufferedImage image = ImageProcess.load(listFilenames.get(i));
+			image = ImageProcess.resize(image, Const.FACE_WIDTH, Const.FACE_HEIGHT);
+			Matrix matrix = ImageProcess.imageToMatrix(image);
+			matrix = ImageProcess.nomalizeMatrix(matrix);
+			double[] input = ImageProcess.matrixToArray(matrix);
+			dataSet.add(new BasicNeuralData(input), new BasicNeuralData(ideal));	
+		}
+	}
+	
+	/**
+	 * Nạp vào thư mục chứa các ảnh hong là face
+	 * @param folder Đường dẫn đến thư mục
+	 */
+	public void addTrainNonFaceData(String folder) {
+		double[] ideal = {0};
+		List<String> listFilenames = IOUtils.listFileName(folder);
+		int listCount = listFilenames.size();
+		for (int i = 0; i < listCount; i ++) {
+			BufferedImage image = ImageProcess.load(listFilenames.get(i));
+			image = ImageProcess.resize(image, Const.FACE_WIDTH, Const.FACE_HEIGHT);
+			Matrix matrix = ImageProcess.imageToMatrix(image);
+			matrix = ImageProcess.nomalizeMatrix(matrix);
+			double[] input = ImageProcess.matrixToArray(matrix);
+			dataSet.add(new BasicNeuralData(input), new BasicNeuralData(ideal));	
+		}
+	}
+	
+	/**
+	 * Phai implement phuong thuc nay moi co the chay
+	 */
+	@Override
+	public void run() {
+		train = new ResilientPropagation(getNetwork(), dataSet);
+		do {
+			train.iteration();
+			System.out.println("Error: " + train.getError());
+		}
+		while (train.getError() > 0.0001);
+		
+		//Thông báo cho lơp quan sát biết đã có sự thay đổi
+		setChanged();
+		notifyObservers();
+	}
 
-    @Override
-    public void run() {
-    	neuralNetwork.learnInSameThread(trainSet);
-    	System.out.println("Xong");
-    	setChanged();
-    	notifyObservers();
-    }
-    
-    /**
-     * Train cho neural network bỏ vào trong thread
-     */
-    public void train() {
-    	thread = new Thread(this);
-    	thread.start();
-    }
-    
-    
-    /**
-     * Nap vao cac face de train
-     * @param listFace Danh sach face can train
-     */
-    public void addFacesToTrain(List<double[]> listFace) {
-    	int listCount = listFace.size();
-    	for (int i = 0; i < listCount; i ++) {
-    		SupervisedTrainingElement trainingElement = 
-    			new SupervisedTrainingElement(listFace.get(i), desireFaceOutput);
-    		trainSet.addElement(trainingElement);
-    	}
-    	
-    }
-    
-    /**
-     * Nap vao none face de train
-     * @param listNoneFace Danh sach none face can nap
-     */
-    public void addNonFaceToTrain(List<double[]> listNoneFace) {
-    	int listCount = listNoneFace.size();
-    	for (int i = 0; i < listCount; i ++) {
-    		SupervisedTrainingElement trainElement = 
-    			new SupervisedTrainingElement(listNoneFace.get(i), desireNoneFaceOutput);
-    		trainSet.addElement(trainElement);
-    	}
-    }
-    
+	public void setNetwork(BasicNetwork network) {
+		this.network = network;
+	}
 
-    /**
-     * Save network to file
-     * @param filename Filename to save network with extention .nnet
-     */
-    public void saveNetwork(String filename) {
-        neuralNetwork.save(filename);
-    }
-
-    /**
-     * Load network from file
-     * @param filename Filename to load network
-     */
-    public void loadNetwork(String filename) {
-        neuralNetwork = NeuralNetwork.load(filename);
-    }
-
-    /**
-     * Classify the face
-     * @param input Face to classify
-     * @return Result of the classify
-     */
-    public boolean faceClassify(double[] input) {
-        neuralNetwork.setInput(input);
-        neuralNetwork.calculate();
-        double[] result = neuralNetwork.getOutputAsArray();
-        if (result[0] <= 0.5F) {
-            return false;
-        }
-        return true;
-    }
-    
-    /**
-     * Reset lai trang thai train set
-     */
-    public void resetTrainSet() {
-    	trainSet = new TrainingSet();
-    }
+	public BasicNetwork getNetwork() {
+		return network;
+	}
 }
