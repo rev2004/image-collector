@@ -3,40 +3,48 @@ package team.nm.nnet.core;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.encog.persist.EncogPersistedCollection;
+
 public class ControlFaceClassify implements Observer{
+	
 	/**
-	 * Đối tượng faceclassify
+	 * Lưu đối tương faceclassify của lớp
 	 */
 	private FaceClassify faceClassify;
 	
 	/**
-	 * Đường dẫn để lưu neural network
+	 * Phương thức khởi tạo cho đối tượng
+	 * @param faceClassify Lớp faceclassify cần chuyền vào
 	 */
-	private String filename;
-	
-	/**
-	 * Contructor khởi tạo cho đối tương
-	 * @param input FaceClassify cần set cho đối tượng
-	 * @param filename Đường dẫn để lưu network khi học xong
-	 */
-	public ControlFaceClassify(FaceClassify input, String filename) {
-		this.faceClassify = input;
-		this.filename = filename;
-		faceClassify.train();
+	public ControlFaceClassify(FaceClassify faceClassify) {
+		this.setFaceClassify(faceClassify);
 	}
 	
+	/**
+	 * Phương thức này thực thi khi quan sát thấy sự thay đổi
+	 */
 	@Override
-	public void update(Observable o, Object arg) {
-		// TODO Auto-generated method stub
-		faceClassify.saveNetwork(filename);	
+	public void update(Observable arg0, Object arg1) {
 		System.out.println("Xong");
+		
 	}
-	
-	/**
-	 * Lấy đối tượng face classify để sử dụng
-	 * @return
-	 */
+
+	public void setFaceClassify(FaceClassify faceClassify) {
+		this.faceClassify = faceClassify;
+	}
+
 	public FaceClassify getFaceClassify() {
 		return faceClassify;
+	}
+	
+	/**
+	 * Lưu network xuống file xml
+	 */
+	public void save() {
+		String filename = System.getProperty("user.dir");
+		filename += "/ref/outputNetwork/network.eg";
+		EncogPersistedCollection en = new EncogPersistedCollection(filename);
+		en.create();
+		en.add("network", faceClassify.getNetwork());
 	}
 }
