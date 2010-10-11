@@ -54,7 +54,7 @@ public class FaceClassify extends Observable implements Runnable{
 		List<String> listFilenames = IOUtils.listFileName(folder);
 		int listCount = listFilenames.size();
 		for (int i = 0; i < listCount; i ++) {
-			BufferedImage image = ImageProcess.load(listFilenames.get(i));
+			BufferedImage image = ImageProcess.load(folder + "\\" + listFilenames.get(i));
 			image = ImageProcess.resize(image, Const.FACE_WIDTH, Const.FACE_HEIGHT);
 			Matrix matrix = ImageProcess.imageToMatrix(image);
 			matrix = ImageProcess.nomalizeMatrix(matrix);
@@ -72,7 +72,7 @@ public class FaceClassify extends Observable implements Runnable{
 		List<String> listFilenames = IOUtils.listFileName(folder);
 		int listCount = listFilenames.size();
 		for (int i = 0; i < listCount; i ++) {
-			BufferedImage image = ImageProcess.load(listFilenames.get(i));
+			BufferedImage image = ImageProcess.load(folder + "\\" + listFilenames.get(i));
 			image = ImageProcess.resize(image, Const.FACE_WIDTH, Const.FACE_HEIGHT);
 			Matrix matrix = ImageProcess.imageToMatrix(image);
 			matrix = ImageProcess.nomalizeMatrix(matrix);
@@ -91,7 +91,7 @@ public class FaceClassify extends Observable implements Runnable{
 			train.iteration();
 			System.out.println("Error: " + train.getError());
 		}
-		while (train.getError() > 0.0001);
+		while (train.getError() > 0.001);
 		
 		//Thông báo cho lơp quan sát biết đã có sự thay đổi
 		setChanged();
