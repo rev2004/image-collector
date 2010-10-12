@@ -12,6 +12,8 @@ import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.networks.layers.BasicLayer;
 import org.encog.neural.networks.training.Train;
 import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation;
+import org.encog.neural.networks.training.strategy.ResetStrategy;
+import org.encog.util.simple.EncogUtility;
 
 import team.nm.nnet.util.IOUtils;
 import team.nm.nnet.util.ImageProcess;
@@ -32,16 +34,11 @@ public class FaceClassify extends Observable implements Runnable{
 	/**
 	 * Luu đối tượng train cho hệ thống
 	 */
-	private Train train;
+	private ResilientPropagation train;
 	
 	public FaceClassify() {
-		network = new BasicNetwork();
-		network.addLayer(new BasicLayer(new ActivationSigmoid(), false, Const.NUMBER_OF_INPUT_NEURAL));
-		network.addLayer(new BasicLayer(new ActivationSigmoid(), false, Const.NUMBER_OF_HIDDEN_NEURAL));
-		network.addLayer(new BasicLayer(new ActivationSigmoid(), false, Const.NUMBER_OF_OUTPUT_NEURAL));
-		network.getStructure().finalizeStructure();
-		network.reset();
-		
+		network = EncogUtility.simpleFeedForward(Const.NUMBER_OF_INPUT_NEURAL, Const.NUMBER_OF_HIDDEN_NEURAL, 0, Const.NUMBER_OF_OUTPUT_NEURAL, true);
+
 		dataSet = new BasicNeuralDataSet();
 	}
 	
@@ -87,11 +84,9 @@ public class FaceClassify extends Observable implements Runnable{
 	@Override
 	public void run() {
 		train = new ResilientPropagation(getNetwork(), dataSet);
-		do {
-			train.iteration();
-			System.out.println("Error: " + train.getError());
-		}
-		while (train.getError() > 0.001);
+		train.addStrategy(new ResetStrategy(0.25, 50));
+		EncogUtility.trainConsole(train ,network, dataSet, 1);
+		
 		
 		//Thông báo cho lơp quan sát biết đã có sự thay đổi
 		setChanged();
