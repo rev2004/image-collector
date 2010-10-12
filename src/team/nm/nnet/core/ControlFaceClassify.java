@@ -25,7 +25,8 @@ public class ControlFaceClassify implements Observer{
 	 */
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		System.out.println("Xong");
+		
+		save();
 		
 	}
 
@@ -42,9 +43,10 @@ public class ControlFaceClassify implements Observer{
 	 */
 	public void save() {
 		String filename = System.getProperty("user.dir");
-		filename += "/ref/outputNetwork/network.eg";
+		filename += "\\ref\\outputNetwork\\network.eg";
 		EncogPersistedCollection en = new EncogPersistedCollection(filename);
 		en.create();
 		en.add("network", faceClassify.getNetwork());
+		System.out.println("Save file to: " + filename);
 	}
 }

@@ -24,7 +24,7 @@ public class Const {
     /**
      * Number of hidden neural
      */
-    public static final int NUMBER_OF_HIDDEN_NEURAL = NUMBER_OF_INPUT_NEURAL + NUMBER_OF_INPUT_NEURAL / 2;
+    public static final int NUMBER_OF_HIDDEN_NEURAL = NUMBER_OF_INPUT_NEURAL + NUMBER_OF_INPUT_NEURAL;
 
     /**
      * Number of output neural
