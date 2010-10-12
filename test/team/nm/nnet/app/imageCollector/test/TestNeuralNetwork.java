@@ -39,6 +39,7 @@ public class TestNeuralNetwork{
 		fc.addObserver(cfc);
 		Thread t = new Thread(fc);
 		t.start();
+		
 	}
 
 }
