@@ -120,7 +120,12 @@ public class ImageProcess {
 		double[][] result = new double[height][width]; 
 		for (int i = 0; i < height; i ++) {
 			for (int j = 0; j < width; j ++) {
-				result[i][j] = matrix.getValue()[i][j] / 255;
+				if (matrix.getValue()[i][j] > 127) {
+					result[i][j] = 0;
+				}
+				else {
+					result[i][j] = 1;
+				}
 			}
 		}
 		return new Matrix(result, width, height);
