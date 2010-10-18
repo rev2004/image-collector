@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Observable;
 
 import org.encog.neural.activation.ActivationSigmoid;
+import org.encog.neural.data.NeuralData;
 import org.encog.neural.data.NeuralDataSet;
 import org.encog.neural.data.basic.BasicNeuralData;
 import org.encog.neural.data.basic.BasicNeuralDataSet;
@@ -76,6 +77,21 @@ public class FaceClassify extends Observable implements Runnable{
 			double[] input = ImageProcess.matrixToArray(matrix);
 			dataSet.add(new BasicNeuralData(input), new BasicNeuralData(ideal));	
 		}
+	}
+	
+	/**
+	 * Phân loại ảnh là gương mặt hay không
+	 * @param input Matra dua vao
+	 * @return Kết quả trả về
+	 */
+	public boolean classify(Matrix input) {
+		double[] array = ImageProcess.matrixToArray(input);
+		BasicNeuralData data = new BasicNeuralData(array);
+		NeuralData result = network.compute(data);
+		if (result.getData()[0] >= 0.5) {
+			return true;
+		}
+		return false;
 	}
 	
 	/**
