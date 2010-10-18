@@ -46,7 +46,7 @@ public class TestFaceClassify {
 			if (index == 0) {
 				index ++;
 			}
-			ideal.setData(i, 1);
+			ideal.setData(1, 1);
 			dataSet.add(data, ideal);
 		}
 		
