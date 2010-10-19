@@ -34,6 +34,16 @@ import javax.imageio.stream.ImageOutputStream;
 import javax.swing.GrayFilter;
 
 public class ImageUtils {
+	
+	public static BufferedImage toBufferedImage(Image image) {
+		BufferedImage bufferedImage = null;
+		if (image != null) {
+			bufferedImage = new BufferedImage(image.getWidth(null),
+					image.getHeight(null), BufferedImage.TYPE_INT_RGB);
+			bufferedImage.createGraphics().drawImage(image, 0, 0, null);
+		}
+		return bufferedImage;
+	}
 
 	/**
 	 * Load anh tra ve buffred image
@@ -47,9 +57,7 @@ public class ImageUtils {
 		try {
 			image = ImageIO.read(file);
 			if (image != null) {
-				bufferedImage = new BufferedImage(image.getWidth(null),
-						image.getHeight(null), BufferedImage.TYPE_INT_RGB);
-				bufferedImage.createGraphics().drawImage(image, 0, 0, null);
+				return toBufferedImage(image);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

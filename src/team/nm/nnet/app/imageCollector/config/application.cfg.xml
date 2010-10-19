@@ -10,4 +10,14 @@
     	<property name="frameHeight" value="${store.image.frame.height}"/>
     </bean>
     
+    <bean 
+    	id="mediaCapture" class="team.nm.nnet.app.imageCollector.layout.MediaCapture">
+    	<property name="locatorString" value="${media.locator}"/>
+    </bean>
+    
+    <bean 
+    	id="capture" class="team.nm.nnet.app.imageCollector.layout.Capture">
+    	<property name="mediaCapture" ref="mediaCapture"/>
+    </bean>
+    
 </beans>
