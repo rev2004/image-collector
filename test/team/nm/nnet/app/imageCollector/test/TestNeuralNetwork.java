@@ -76,7 +76,7 @@ public class TestNeuralNetwork{
 		for (int i = 0; i < listTrain.size(); i ++) {
 			Image image = ImageIO.read(new File(trainFolder + "\\" + listTrain.get(i)));
 			ImageNeuralData data = new ImageNeuralData(image);
-			double[] array = new double[6];
+			double[] array = new double[2];
 			NeuralData ideal = new BasicNeuralData(array);
 			ideal.setData(i, 1);
 			dataSet.add(data, ideal);
