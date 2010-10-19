@@ -13,6 +13,7 @@ import org.encog.neural.data.image.ImageNeuralDataSet;
 import org.encog.neural.networks.BasicNetwork;
 import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation;
 import org.encog.neural.networks.training.strategy.ResetStrategy;
+import org.encog.persist.EncogPersistedCollection;
 import org.encog.util.downsample.SimpleIntensityDownsample;
 import org.encog.util.simple.EncogUtility;
 
@@ -54,8 +55,23 @@ public class TestFaceClassify {
 		BasicNetwork network = EncogUtility.simpleFeedForward(dataSet.getInputSize(), 300, 150, dataSet.getIdealSize(), true);
 		ResilientPropagation train = new ResilientPropagation(network, dataSet);
 		train.addStrategy(new ResetStrategy(0.25, 50));
-		EncogUtility.trainConsole(train, network, dataSet,4);
-		System.out.println("Train complete");
+		//EncogUtility.trainConsole(train, network, dataSet,4);
+		//System.out.println("Train complete");
+		do {
+			train.iteration();
+			System.out.println(train.getError());
+		}
+		while (train.getError() > 0.05);
+		
+		/*
+		System.out.println("Save file");
+		
+		EncogPersistedCollection epc = new EncogPersistedCollection(System.getProperty("user.dir") + "\\ref\\outputNetwork\\network.eg");
+		epc.create();
+		epc.clear();
+		epc.add("network", network);
+		*/
+
 		System.out.println("Face test");
 		List<String> listTest = IOUtils.listFileName(facesTrain);
 		for (int i = 0; i < listTest.size(); i ++) {
@@ -68,6 +84,29 @@ public class TestFaceClassify {
 		listTest = IOUtils.listFileName(noneFacesTrain);
 		for (int i = 0; i < listTest.size(); i ++) {
 			Image image = ImageIO.read(new File(noneFacesTrain + "\\" + listTest.get(i)));
+			ImageNeuralData input = new ImageNeuralData(image);
+			input.downsample(new SimpleIntensityDownsample(), false, 30, 20, 1, -1);
+			System.out.println("Index is: " + network.winner(input));
+		}
+		
+		
+		System.out.println("Actual test face");
+		String testFaces = folder + "\\testFaces";
+		
+		listTest = IOUtils.listFileName(testFaces);
+		for (int i = 0; i < listTest.size(); i ++) {
+			Image image = ImageIO.read(new File(testFaces + "\\" + listTest.get(i)));
+			ImageNeuralData input = new ImageNeuralData(image);
+			input.downsample(new SimpleIntensityDownsample(), false, 30, 20, 1, -1);
+			System.out.println("Index is: " + network.winner(input));
+		}
+		
+		System.out.println("Actual test none face");
+		String testNonFaces = folder + "\\testNonFaces";
+		
+		listTest = IOUtils.listFileName(testNonFaces);
+		for (int i = 0; i < listTest.size(); i ++) {
+			Image image = ImageIO.read(new File(testNonFaces + "\\" + listTest.get(i)));
 			ImageNeuralData input = new ImageNeuralData(image);
 			input.downsample(new SimpleIntensityDownsample(), false, 30, 20, 1, -1);
 			System.out.println("Index is: " + network.winner(input));
