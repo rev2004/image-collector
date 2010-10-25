@@ -16,18 +16,19 @@ public class Const {
      */
     public static final int FACE_WIDTH = 20;
 
+   
     /**
-     * Number of input layer
+     * Number of hidden neural 1
      */
-    public static final int NUMBER_OF_INPUT_NEURAL = FACE_WIDTH * FACE_HEIGHT;
+    public static final int FACE_CLASSIFY_NUMBER_OF_HIDDEN_NEURAL_1 = 300;
 
     /**
-     * Number of hidden neural
+     * Number of hidden neural 2
      */
-    public static final int NUMBER_OF_HIDDEN_NEURAL = NUMBER_OF_INPUT_NEURAL + NUMBER_OF_INPUT_NEURAL;
-
+    public static final int FACE_CLASSIFY_NUMBER_OF_HIDDEN_NEURAL_2 = 150;
+    
     /**
-     * Number of output neural
+     * So luong neural output do de la 2 no se khong chay
      */
-    public static final int NUMBER_OF_OUTPUT_NEURAL = 1;
+    public static final int FACE_CLASSIFY_NUMBER_OF_OUTPUT_NEURAL = 20;
 }

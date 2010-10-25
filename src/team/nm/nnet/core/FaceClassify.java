@@ -1,119 +1,146 @@
 package team.nm.nnet.core;
 
-import java.awt.image.BufferedImage;
+import java.awt.Image;
+import java.io.File;
 import java.util.List;
-import java.util.Observable;
 
-import org.encog.neural.activation.ActivationSigmoid;
+import javax.imageio.ImageIO;
+
 import org.encog.neural.data.NeuralData;
-import org.encog.neural.data.NeuralDataSet;
 import org.encog.neural.data.basic.BasicNeuralData;
-import org.encog.neural.data.basic.BasicNeuralDataSet;
+import org.encog.neural.data.image.ImageNeuralData;
+import org.encog.neural.data.image.ImageNeuralDataSet;
 import org.encog.neural.networks.BasicNetwork;
-import org.encog.neural.networks.layers.BasicLayer;
-import org.encog.neural.networks.training.Train;
 import org.encog.neural.networks.training.propagation.resilient.ResilientPropagation;
 import org.encog.neural.networks.training.strategy.ResetStrategy;
+import org.encog.persist.EncogPersistedCollection;
+import org.encog.util.downsample.SimpleIntensityDownsample;
 import org.encog.util.simple.EncogUtility;
 
 import team.nm.nnet.util.IOUtils;
-import team.nm.nnet.util.ImageProcess;
-import team.nm.nnet.util.Matrix;
 
-public class FaceClassify extends Observable implements Runnable{
+
+
+public class FaceClassify{
 
 	/**
-	 * Lưu network cua hệ thống
+	 * Ten cua network khi luu xuong file
+	 */
+	private String networkName = "network";
+	
+	
+	/*
+	 * Luu data cho viec train
+	 */
+	private ImageNeuralDataSet dataSet = new ImageNeuralDataSet(new SimpleIntensityDownsample(), false, 1, -1);
+	
+	/**
+	 * Mang neural
 	 */
 	private BasicNetwork network;
-	
 	/**
-	 * Lưu dữ liệu train cho network
+	 * Add thu muc chua face de train
+	 * @param path Duong dan den thu muc chua face
 	 */
-	private NeuralDataSet dataSet;
-	
-	/**
-	 * Luu đối tượng train cho hệ thống
-	 */
-	private ResilientPropagation train;
-	
-	public FaceClassify() {
-		network = EncogUtility.simpleFeedForward(Const.NUMBER_OF_INPUT_NEURAL, Const.NUMBER_OF_HIDDEN_NEURAL, 0, Const.NUMBER_OF_OUTPUT_NEURAL, true);
-
-		dataSet = new BasicNeuralDataSet();
-	}
-	
-	/**
-	 * Nạp vào thư mục chứa các ảnh la face
-	 * @param folder Đường dẫn đến thư mục
-	 */
-	public void addTrainFaceData(String folder) {
-		double[] ideal = {1};
-		List<String> listFilenames = IOUtils.listFileName(folder);
-		int listCount = listFilenames.size();
-		for (int i = 0; i < listCount; i ++) {
-			BufferedImage image = ImageProcess.load(folder + "\\" + listFilenames.get(i));
-			image = ImageProcess.resize(image, Const.FACE_WIDTH, Const.FACE_HEIGHT);
-			Matrix matrix = ImageProcess.imageToMatrix(image);
-			matrix = ImageProcess.nomalizeMatrix(matrix);
-			double[] input = ImageProcess.matrixToArray(matrix);
-			dataSet.add(new BasicNeuralData(input), new BasicNeuralData(ideal));	
+	public void addFaceToTrain(String path) {
+		try {
+		List<String> listFilename = IOUtils.listFileName(path);
+			for (int i = 0; i < listFilename.size(); i ++) {
+				Image image = ImageIO.read(new File(path + "\\" + listFilename.get(i)));
+				ImageNeuralData data = new ImageNeuralData(image);
+				double[] array = new double[Const.FACE_CLASSIFY_NUMBER_OF_OUTPUT_NEURAL];
+				NeuralData ideal = new BasicNeuralData(array);
+				ideal.setData(0, 1);
+				dataSet.add(data, ideal);
+			}
+		}
+		catch (Exception ex) {
+			ex.printStackTrace();
 		}
 	}
 	
 	/**
-	 * Nạp vào thư mục chứa các ảnh hong là face
-	 * @param folder Đường dẫn đến thư mục
+	 * Add thu muc chua none face de train
+	 * @param path Duong dan den thu muc chua none face
 	 */
-	public void addTrainNonFaceData(String folder) {
-		double[] ideal = {0};
-		List<String> listFilenames = IOUtils.listFileName(folder);
-		int listCount = listFilenames.size();
-		for (int i = 0; i < listCount; i ++) {
-			BufferedImage image = ImageProcess.load(folder + "\\" + listFilenames.get(i));
-			image = ImageProcess.resize(image, Const.FACE_WIDTH, Const.FACE_HEIGHT);
-			Matrix matrix = ImageProcess.imageToMatrix(image);
-			matrix = ImageProcess.nomalizeMatrix(matrix);
-			double[] input = ImageProcess.matrixToArray(matrix);
-			dataSet.add(new BasicNeuralData(input), new BasicNeuralData(ideal));	
+	public void addNonFaceToTrain(String path) {
+		try {
+		List<String> listFilename = IOUtils.listFileName(path);
+			for (int i = 0; i < listFilename.size(); i ++) {
+				Image image = ImageIO.read(new File(path + "\\" + listFilename.get(i)));
+				ImageNeuralData data = new ImageNeuralData(image);
+				double[] array = new double[Const.FACE_CLASSIFY_NUMBER_OF_OUTPUT_NEURAL];
+				NeuralData ideal = new BasicNeuralData(array);
+				ideal.setData(1, 1);
+				dataSet.add(data, ideal);
+			}
+		}
+		catch (Exception ex) {
+			ex.printStackTrace();
 		}
 	}
 	
 	/**
-	 * Phân loại ảnh là gương mặt hay không
-	 * @param input Matra dua vao
-	 * @return Kết quả trả về
+	 * Train cho network
 	 */
-	public boolean classify(Matrix input) {
-		double[] array = ImageProcess.matrixToArray(input);
-		BasicNeuralData data = new BasicNeuralData(array);
-		NeuralData result = network.compute(data);
-		if (result.getData()[0] >= 0.5) {
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * Phai implement phuong thuc nay moi co the chay
-	 */
-	@Override
-	public void run() {
-		train = new ResilientPropagation(getNetwork(), dataSet);
+	public void train() {
+		dataSet.downsample(Const.FACE_HEIGHT, Const.FACE_WIDTH);
+		network = EncogUtility.simpleFeedForward(dataSet.getInputSize(), Const.FACE_CLASSIFY_NUMBER_OF_HIDDEN_NEURAL_1, Const.FACE_CLASSIFY_NUMBER_OF_HIDDEN_NEURAL_2, dataSet.getIdealSize(), true);
+		ResilientPropagation train = new ResilientPropagation(network, dataSet);
 		train.addStrategy(new ResetStrategy(0.25, 50));
-		EncogUtility.trainConsole(train ,network, dataSet, 1);
+		int epoch = 0;
+		do {
+			train.iteration();
+			System.out.println("Epoch is : " + epoch);
+			System.out.println("Error is : " + train.getError());
+			epoch ++;
+		}
+		while (train.getError() > 0.005);
+		System.out.println("Final epoch is : " + epoch);
+		System.out.println("Final error is : " + train.getError());
 		
-		
-		//Thông báo cho lơp quan sát biết đã có sự thay đổi
-		setChanged();
-		notifyObservers();
+	}
+	
+	/**
+	 * Nhan dang phai la guong mat hay khong
+	 * @param filename Duong dan toi guong mat
+	 * @return Ket qua nhan dang
+	 */
+	public boolean isFace(String filename) {
+		try {
+			Image image = ImageIO.read(new File(filename));
+			ImageNeuralData input = new ImageNeuralData(image);
+			input.downsample(new SimpleIntensityDownsample(), false, Const.FACE_HEIGHT, Const.FACE_WIDTH, 1, -1);
+			int index = network.winner(input);
+			if (index == 0) {
+				return true;
+			}
+			return false;
+		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+			return false;
+		}
+	}
+	
+	/**
+	 * Luu network xuong file
+	 * @param filename Duong dan luu file 
+	 */
+	public void saveNetwork(String filename) {
+		EncogPersistedCollection epc = new EncogPersistedCollection(filename);
+		epc.create();
+		epc.clear();
+		epc.add(networkName, network);
+	}
+	
+	/**
+	 * Load network tu file
+	 * @param filename Duong dan load file
+	 */
+	public void loadNetwork(String filename) {
+		EncogPersistedCollection epc = new EncogPersistedCollection(filename);
+		network = (BasicNetwork) epc.find(networkName);
 	}
 
-	public void setNetwork(BasicNetwork network) {
-		this.network = network;
-	}
-
-	public BasicNetwork getNetwork() {
-		return network;
-	}
 }
