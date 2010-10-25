@@ -20,7 +20,6 @@ import org.encog.util.downsample.SimpleIntensityDownsample;
 import org.encog.util.simple.EncogUtility;
 
 import team.nm.nnet.core.Const;
-import team.nm.nnet.core.ControlFaceClassify;
 import team.nm.nnet.core.FaceClassify;
 import team.nm.nnet.util.IOUtils;
 import team.nm.nnet.util.ImageProcess;
