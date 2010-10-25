@@ -17,6 +17,7 @@ import org.encog.persist.EncogPersistedCollection;
 import org.encog.util.downsample.SimpleIntensityDownsample;
 import org.encog.util.simple.EncogUtility;
 
+import team.nm.nnet.core.FaceClassify;
 import team.nm.nnet.util.IOUtils;
 
 public class TestFaceClassify {
@@ -27,7 +28,40 @@ public class TestFaceClassify {
 		folder += "\\ref\\imageStore";
 		String facesTrain = folder + "\\faces";
 		String noneFacesTrain = folder + "\\nonFaces";
-		List<String> listFaces = IOUtils.listFileName(facesTrain);
+		FaceClassify fc = new FaceClassify();
+		
+		fc.addFaceToTrain(facesTrain);
+		fc.addNonFaceToTrain(noneFacesTrain);
+		fc.train();
+		
+		System.out.println("Face test");
+		List<String> listTest = IOUtils.listFileName(facesTrain);
+		for (int i = 0; i < listTest.size(); i ++) {
+			System.out.println(fc.isFace(facesTrain + "\\" + listTest.get(i)));
+		}
+		
+		System.out.println("None ace test");
+		listTest = IOUtils.listFileName(noneFacesTrain);
+		for (int i = 0; i < listTest.size(); i ++) {
+			System.out.println(fc.isFace(noneFacesTrain + "\\" + listTest.get(i)));
+		}
+		
+		System.out.println("Actual test face");
+		String testFaces = folder + "\\testFaces";
+		listTest = IOUtils.listFileName(testFaces);
+		for (int i = 0; i < listTest.size(); i ++) {
+			System.out.println(fc.isFace(testFaces + "\\" + listTest.get(i)));
+		}
+		
+		System.out.println("Actual test none face");
+		String testNonFaces = folder + "\\testNonFaces";
+		listTest = IOUtils.listFileName(testNonFaces);
+		for (int i = 0; i < listTest.size(); i ++) {
+			System.out.println(fc.isFace(testNonFaces + "\\" + listTest.get(i)));
+		}
+		
+		
+		/*List<String> listFaces = IOUtils.listFileName(facesTrain);
 		for (int i = 0; i < listFaces.size(); i ++) {
 			Image image = ImageIO.read(new File(facesTrain + "\\" + listFaces.get(i)));
 			ImageNeuralData data = new ImageNeuralData(image);
@@ -43,10 +77,6 @@ public class TestFaceClassify {
 			ImageNeuralData data = new ImageNeuralData(image);
 			double[] array = new double[20];
 			NeuralData ideal = new BasicNeuralData(array);
-			int index = i % 20;
-			if (index == 0) {
-				index ++;
-			}
 			ideal.setData(1, 1);
 			dataSet.add(data, ideal);
 		}
@@ -61,16 +91,16 @@ public class TestFaceClassify {
 			train.iteration();
 			System.out.println(train.getError());
 		}
-		while (train.getError() > 0.05);
+		while (train.getError() > 0.005);
 		
-		/*
+		
 		System.out.println("Save file");
 		
 		EncogPersistedCollection epc = new EncogPersistedCollection(System.getProperty("user.dir") + "\\ref\\outputNetwork\\network.eg");
 		epc.create();
 		epc.clear();
 		epc.add("network", network);
-		*/
+		
 
 		System.out.println("Face test");
 		List<String> listTest = IOUtils.listFileName(facesTrain);
@@ -111,6 +141,6 @@ public class TestFaceClassify {
 			input.downsample(new SimpleIntensityDownsample(), false, 30, 20, 1, -1);
 			System.out.println("Index is: " + network.winner(input));
 		}
-		
+		*/
 	}
 }
