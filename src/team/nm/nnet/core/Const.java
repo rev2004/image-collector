@@ -31,4 +31,9 @@ public class Const {
      * So luong neural output do de la 2 no se khong chay
      */
     public static final int FACE_CLASSIFY_NUMBER_OF_OUTPUT_NEURAL = 20;
+    
+    /**
+     * Buoc nhay frame anh
+     */
+    public static final int JUMP_LENGHT = 5;
 }

@@ -124,6 +124,27 @@ public class FaceClassify{
 	}
 	
 	/**
+	 * Nhan dien anh la guong mat hay khong
+	 * @param image Anh can nhan dien
+	 * @return Ket qua nhan dien
+	 */
+	public boolean isFace(Image image) {
+		try {
+			ImageNeuralData input = new ImageNeuralData(image);
+			input.downsample(new SimpleIntensityDownsample(), false, Const.FACE_HEIGHT, Const.FACE_WIDTH, 1, -1);
+			int index = network.winner(input);
+			if (index == 0) {
+				return true;
+			}
+			return false;
+		}
+		catch (Exception ex) {
+			ex.printStackTrace();
+			return false;
+		}
+	}
+	
+	/**
 	 * Luu network xuong file
 	 * @param filename Duong dan luu file 
 	 */
