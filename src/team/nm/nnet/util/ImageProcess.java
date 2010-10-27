@@ -70,6 +70,20 @@ public class ImageProcess {
 	}
 	
 	/**
+	 * Resize anh theo phan tram
+	 * @param image Anh can resize
+	 * @param percent Phan tram can resize
+	 * @return Ket qua resize
+	 */
+	public static BufferedImage resize(BufferedImage image, int percent) {
+		int width = image.getWidth();
+		int height = image.getHeight();
+		int newWidth = percent * width / 100;
+		int newHeight = percent * height / 100;
+		return ImageProcess.resize(image, newWidth, newHeight);
+	}
+	
+	/**
 	 * Chiểu ảnh thành mảng ma tran
 	 * @param image Ảnh cần chuyển
 	 * @return Kết quả chuyển
@@ -130,5 +144,8 @@ public class ImageProcess {
 		}
 		return new Matrix(result, width, height);
 	}
+	
+	
+	
 
 }
