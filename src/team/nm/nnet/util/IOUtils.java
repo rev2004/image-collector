@@ -26,8 +26,32 @@ public class IOUtils {
         return children;
     }
     
+    /**
+     * Xac dinh file co ton tai hay khong
+     * @param filename File name can xac dinh
+     * @return Ket qua
+     */
     public static boolean exists(String filename) {
     	File file = new File(filename);
     	return file.exists();
+    }
+    
+    /**
+     * List cac folder con trong thu muc. Cac folder con cap 1 thoi nha
+     * @param parentFolder Duong dan den folder cha
+     * @return Ket qua kiem duoc
+     */
+    public static List<String> listSubFolder(String parentFolder) {
+    	File parentDir = new File(parentFolder);
+    	File[] listChildren = parentDir.listFiles();
+    	List<String> listSubFolder = new ArrayList<String>();
+    	if (listChildren != null) {
+    		for (File fileI : listChildren) {
+    			if (fileI.isDirectory()) {
+    				listSubFolder.add(fileI.getName());
+    			}
+    		}
+    	}
+    	return listSubFolder;
     }
 }
