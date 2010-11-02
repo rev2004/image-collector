@@ -89,13 +89,15 @@ public class FaceClassify{
 		ResilientPropagation train = new ResilientPropagation(network, dataSet);
 		train.addStrategy(new ResetStrategy(0.25, 50));
 		int epoch = 0;
-		do {
+		for (int i = 0; i < 1000; i ++) {
 			train.iteration();
 			System.out.println("Epoch is : " + epoch);
 			System.out.println("Error is : " + train.getError());
 			epoch ++;
+			if (train.getError() < 0.0005) {
+				return;
+			}
 		}
-		while (train.getError() > 0.005);
 		System.out.println("Final epoch is : " + epoch);
 		System.out.println("Final error is : " + train.getError());
 		
