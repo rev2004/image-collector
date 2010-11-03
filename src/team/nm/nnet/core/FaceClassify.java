@@ -26,7 +26,7 @@ public class FaceClassify{
 	/**
 	 * Ten cua network khi luu xuong file
 	 */
-	private String networkName = "network";
+	private String networkName = "faceclassify";
 	
 	
 	/*
