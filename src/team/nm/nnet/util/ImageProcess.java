@@ -145,7 +145,27 @@ public class ImageProcess {
 		return new Matrix(result, width, height);
 	}
 	
-	
+	/**
+	 * Gan mash cho anh. Phan mau den cua mask se duoc to mau den trong anh.
+	 * @param image Anh can gan mask
+	 * @param mask Mask gan cho anh
+	 * @return Ket qua
+	 */
+	public static BufferedImage maskForImage(BufferedImage image, BufferedImage mask) {
+		Raster raster = mask.getRaster();
+		int width = mask.getWidth();
+		int height = mask.getHeight();
+		for (int i = 0; i < height; i ++) {
+			for (int j = 0; j < width; j ++) {
+				double[] value = new double[3];
+				value = raster.getPixel(j, i, value);
+				if ((value[0] + value[1] + value[2] < 127)) {
+					image.setRGB(j, i, 0);
+				}
+			}
+		}
+		return image;
+	}
 	
 
 }
