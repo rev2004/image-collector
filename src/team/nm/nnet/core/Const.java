@@ -36,4 +36,9 @@ public class Const {
      * Buoc nhay frame anh
      */
     public static final int JUMP_LENGHT = 5;
+    
+    /**
+     * Luu duong dan file mask
+     */
+    public static final String MASK_IMAGE = System.getProperty("user.dir") + "/ref/imageStore/mask.jpg";
 }
