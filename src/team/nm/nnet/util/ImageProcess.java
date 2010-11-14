@@ -159,7 +159,7 @@ public class ImageProcess {
 			for (int j = 0; j < width; j ++) {
 				double[] value = new double[3];
 				value = raster.getPixel(j, i, value);
-				if ((value[0] + value[1] + value[2] < 127)) {
+				if ((value[0] + value[1] + value[2] < 150)) {
 					image.setRGB(j, i, 0);
 				}
 			}
