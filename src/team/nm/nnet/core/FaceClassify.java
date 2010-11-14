@@ -89,7 +89,7 @@ public class FaceClassify{
 		ResilientPropagation train = new ResilientPropagation(network, dataSet);
 		train.addStrategy(new ResetStrategy(0.25, 50));
 		int epoch = 0;
-		for (int i = 0; i < 1000; i ++) {
+		for (int i = 0; i < 500; i ++) {
 			train.iteration();
 			System.out.println("Epoch is : " + epoch);
 			System.out.println("Error is : " + train.getError());
