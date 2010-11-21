@@ -8,16 +8,18 @@
     	id="imageStore" class="team.nm.nnet.app.imageCollector.basis.ImageStore">
     	<property name="frameWidth" value="${store.image.frame.width}"/>
     	<property name="frameHeight" value="${store.image.frame.height}"/>
-    </bean>
-    
+    </bean>    
     <bean 
     	id="mediaCapture" class="team.nm.nnet.app.imageCollector.layout.MediaCapture">
     	<property name="locatorString" value="${media.locator}"/>
-    </bean>
-    
+    </bean>    
     <bean 
     	id="capture" class="team.nm.nnet.app.imageCollector.layout.Capture">
-    	<property name="mediaCapture" ref="mediaCapture"/>
+    	<constructor-arg ref="mediaCapture"/>
+    </bean>
+    <bean 
+    	id="mainFrame" class="team.nm.nnet.app.imageCollector.layout.MainFrame">
+    	<property name="capture" ref="capture"/>
     </bean>
     
 </beans>

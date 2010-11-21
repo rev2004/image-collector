@@ -35,6 +35,10 @@ import javax.swing.GrayFilter;
 
 public class ImageUtils {
 	
+	public static Image toImage(BufferedImage bufferedImage) {
+	    return Toolkit.getDefaultToolkit().createImage(bufferedImage.getSource());
+	}
+	
 	public static BufferedImage toBufferedImage(Image image) {
 		BufferedImage bufferedImage = null;
 		if (image != null) {
@@ -216,7 +220,7 @@ public class ImageUtils {
 		grayScaleBuff.createGraphics().drawImage(image, 0, 0, null);
 		return grayScaleBuff;
 	}
-
+	
 	/**
 	 * Chuyen image thanh array
 	 * @param bufferedImage Anh can chuyen thanh array
