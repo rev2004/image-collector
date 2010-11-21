@@ -20,12 +20,12 @@ public class Const {
     /**
      * Number of hidden neural 1
      */
-    public static final int FACE_CLASSIFY_NUMBER_OF_HIDDEN_NEURAL_1 = 600;
+    public static final int FACE_CLASSIFY_NUMBER_OF_HIDDEN_NEURAL_1 = 700;
 
     /**
      * Number of hidden neural 2
      */
-    public static final int FACE_CLASSIFY_NUMBER_OF_HIDDEN_NEURAL_2 = 300;
+    public static final int FACE_CLASSIFY_NUMBER_OF_HIDDEN_NEURAL_2 = 700;
     
     /**
      * So luong neural output do de la 2 no se khong chay

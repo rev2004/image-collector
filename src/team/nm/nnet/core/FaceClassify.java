@@ -3,6 +3,7 @@ package team.nm.nnet.core;
 import java.awt.Image;
 import java.io.File;
 import java.util.List;
+import java.util.Observable;
 
 import javax.imageio.ImageIO;
 
@@ -21,8 +22,13 @@ import team.nm.nnet.util.IOUtils;
 
 
 
-public class FaceClassify{
+public class FaceClassify extends Observable implements Runnable{
 
+	/**
+	 * Luu duong dan cua mang neural
+	 */
+	private String filename;
+	
 	/**
 	 * Ten cua network khi luu xuong file
 	 */
@@ -165,5 +171,22 @@ public class FaceClassify{
 		EncogPersistedCollection epc = new EncogPersistedCollection(filename);
 		network = (BasicNetwork) epc.find(networkName);
 	}
+	
+	/**
+	 * Thiet lap duong dan de luu file
+	 * @param filename Duong dan thiet lap
+	 */
+	public void setFilename(String filename) {
+		this.filename = filename;
+		
+	}
 
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		train();
+		System.out.println("Bat dau save file");
+		saveNetwork(filename);
+		System.out.println("Da luu file xong");
+	}
 }
