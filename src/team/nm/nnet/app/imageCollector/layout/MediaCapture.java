@@ -2,6 +2,7 @@ package team.nm.nnet.app.imageCollector.layout;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
@@ -23,7 +24,6 @@ import javax.swing.JFileChooser;
 import org.springframework.beans.factory.annotation.Required;
 
 import team.nm.nnet.app.imageCollector.utils.ImageFilter;
-import team.nm.nnet.app.imageCollector.utils.ImagePanel;
 import team.nm.nnet.util.ImageUtils;
 
 public class MediaCapture extends Panel implements ActionListener {
@@ -32,41 +32,54 @@ public class MediaCapture extends Panel implements ActionListener {
 	
 	private static Player player;
 	private MediaLocator mediaLocator;
+	private Component comp;
 	private JButton saveBtn;
+	private JButton takeBtn;
 	private Buffer buffer;
 	private Image img;
 	private BufferToImage buffToImg;
-	private ImagePanel imgPanel;
 	private String locatorString;
+	private MainFrame parent;
 
 	public void initialize() {
 		setLayout(new BorderLayout());
 
-		imgPanel = new ImagePanel();
 		saveBtn = new JButton("Lưu ảnh");
+		takeBtn = new JButton("Chụp ảnh");
 		saveBtn.addActionListener(this);
+		takeBtn.addActionListener(this);
 
 		mediaLocator = new MediaLocator(locatorString);
 
 		try {
 			player = Manager.createRealizedPlayer(mediaLocator);
 			player.start();
-			Component comp;
 			if ((comp = player.getVisualComponent()) != null) {
 				setSize(comp.getSize());
-				imgPanel.setSize(comp.getSize());
-				add(comp, BorderLayout.NORTH);
+				add(comp, BorderLayout.CENTER);
 			}
-			add(saveBtn, BorderLayout.CENTER);
-			add(imgPanel, BorderLayout.SOUTH);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		Panel footer = new Panel();
+		footer.setLayout(new FlowLayout(FlowLayout.CENTER, 100, 10));
+		footer.add(saveBtn);
+		footer.add(takeBtn);
+		add(footer, BorderLayout.SOUTH);
 	}
 
+	public void play() {
+		player.start();
+	}
+	
+	public void stop() {
+		player.stop();
+	}
+	
 	public void close() {
 		player.close();
-		player.deallocate();
+		player.deallocate();		
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -83,11 +96,16 @@ public class MediaCapture extends Panel implements ActionListener {
 						action(selectedFile);
 					}
 				}
+			} else if (c == takeBtn) {
+				takeImage();
+				if(parent != null) {
+					parent.displayImage(img);
+				}
 			}
 		}
 	}
-
-	protected void action(File file) {
+	
+	protected void takeImage() {
 		// Grab a frame
 		FrameGrabbingControl fgc = (FrameGrabbingControl) player.getControl("javax.media.control.FrameGrabbingControl");
 		buffer = fgc.grabFrame();
@@ -95,9 +113,11 @@ public class MediaCapture extends Panel implements ActionListener {
 		// Convert it to an image
 		buffToImg = new BufferToImage((VideoFormat) buffer.getFormat());
 		img = buffToImg.createImage(buffer);
+	}
 
-		// show the image
-		imgPanel.setImage(img);
+	protected void action(File file) {
+		
+		takeImage();
 
 		// save image
 		BufferedImage bufferedImage = ImageUtils.toBufferedImage(img);
@@ -114,5 +134,9 @@ public class MediaCapture extends Panel implements ActionListener {
 	@Required
 	public void setLocatorString(String locatorString) {
 		this.locatorString = locatorString;
+	}
+	
+	public void setParent(MainFrame parent) {
+		this.parent = parent;
 	}
 }

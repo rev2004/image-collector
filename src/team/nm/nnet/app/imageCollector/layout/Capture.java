@@ -5,39 +5,46 @@ import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
-import org.springframework.beans.factory.annotation.Required;
-
 public class Capture {
 
 	private MediaCapture mediaCapture;
-	private JFrame frame;
+	private JFrame frame = null;
 	
-	public Capture() {
-		frame = new JFrame();
+	public Capture(MediaCapture mediaCapture) {
+		this.mediaCapture = mediaCapture;
 	}
+	
 	public void show() {
 
-		mediaCapture.initialize();
-        frame.addWindowListener(new WindowAdapter() {
- 
-            public void windowClosing(WindowEvent e) {
-            	mediaCapture.close();
-                System.exit(0);
-            }
-        });
- 
-        frame.add("Center", mediaCapture);
-        frame.setSize(mediaCapture.getSize());
-        frame.pack();
+		if(frame == null) {
+			mediaCapture.initialize();		
+			frame = new JFrame();
+	        frame.addWindowListener(new WindowAdapter() {
+	 
+	            public void windowClosing(WindowEvent e) {
+	            	mediaCapture.stop();
+	            	super.windowClosing(e);
+	            }
+	            
+	            @Override
+	            public void windowClosed(WindowEvent e) {
+	            	mediaCapture.close();
+	            	super.windowClosed(e);
+	            }
+	        });
+	 
+	        frame.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
+	        frame.add("Center", mediaCapture);
+	        frame.setTitle("Camera - NM Team");
+	        frame.setSize(mediaCapture.getSize());
+	        frame.pack();
+		} else {
+			mediaCapture.play();
+		}
         frame.setVisible(true);
 	}
 	
-	public void setTitle(String title) {
-		frame.setTitle(title);
-	}
-
-	@Required
-	public void setMediaCapture(MediaCapture mediaCapture) {
-		this.mediaCapture = mediaCapture;
+	public void setParent(MainFrame parent) {
+		mediaCapture.setParent(parent);
 	}
 }

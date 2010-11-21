@@ -88,19 +88,19 @@ public class ImageProcess {
 	 * @param image Ảnh cần chuyển
 	 * @return Kết quả chuyển
 	 */
-	public static Matrix imageToMatrix(BufferedImage image) {
+	public static Matrix<Double> imageToMatrix(BufferedImage image) {
         int width = image.getWidth();
         int height = image.getHeight();
         Raster raster = image.getRaster();
-        double[][] r = new double[height][width];
+        Double[][] r = new Double[height][width];
         float[] sample = new float[3];
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 sample = raster.getPixel(j, i, sample);
-                r[i][j] = (sample[0] + sample[1] + sample[2]) / 3;
+                r[i][j] = new Double((sample[0] + sample[1] + sample[2]) / 3);
             }
         }
-        Matrix result = new Matrix(r, width, height);
+        Matrix<Double> result = new Matrix<Double>(r, width, height);
         return result;
     }
 	
@@ -109,8 +109,8 @@ public class ImageProcess {
 	 * @param matrix Matran cần chuyển
 	 * @return Kết quả chuyển
 	 */
-	public static double[] matrixToArray(Matrix matrix) {
-        double[][] a = matrix.getValue();
+	public static double[] matrixToArray(Matrix<Double> matrix) {
+        Double[][] a = matrix.getValue();
         int width = matrix.getWidth();
         int height = matrix.getHeight();
         double[] result = new double[height * width];
@@ -128,21 +128,21 @@ public class ImageProcess {
 	 * @param matrix Matran cần chuẩn hóa
 	 * @return Kết quả chuẩn hóa
 	 */
-	public static Matrix nomalizeMatrix(Matrix matrix) {
+	public static Matrix<Double> nomalizeMatrix(Matrix<Double> matrix) {
 		int width = matrix.getWidth();
 		int height = matrix.getHeight();
-		double[][] result = new double[height][width]; 
+		Double[][] result = new Double[height][width]; 
 		for (int i = 0; i < height; i ++) {
 			for (int j = 0; j < width; j ++) {
 				if (matrix.getValue()[i][j] > 127) {
-					result[i][j] = 0;
+					result[i][j] = new Double(0);
 				}
 				else {
-					result[i][j] = 1;
+					result[i][j] = new Double(1);
 				}
 			}
 		}
-		return new Matrix(result, width, height);
+		return new Matrix<Double>(result, width, height);
 	}
 	
 	/**

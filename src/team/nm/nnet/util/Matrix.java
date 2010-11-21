@@ -1,11 +1,11 @@
 package team.nm.nnet.util;
 
-public class Matrix {
+public class Matrix<E> {
 
 	/**
 	 * Giá trị của ma trận
 	 */
-	private double[][] value;
+	private E[][] value;
 	
 	/**
 	 * Chiều rộng của matran
@@ -23,17 +23,17 @@ public class Matrix {
 	 * @param width Chiều rộng ma tran
 	 * @param height Chiều cao ma tran
 	 */
-	public Matrix(double[][] value, int width, int height) {
+	public Matrix(E[][] value, int width, int height) {
 		this.value = value;
 		this.width = width;
 		this.height = height;
 	}
 
-	public void setValue(double[][] value) {
+	public void setValue(E[][] value) {
 		this.value = value;
 	}
 
-	public double[][] getValue() {
+	public E[][] getValue() {
 		return value;
 	}
 
