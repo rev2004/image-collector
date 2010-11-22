@@ -2,21 +2,29 @@ package team.nm.nnet.util;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.HeadlessException;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
+import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
+import java.awt.image.ColorModel;
 import java.awt.image.ConvolveOp;
 import java.awt.image.DataBuffer;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
 import java.awt.image.ImageProducer;
 import java.awt.image.Kernel;
+import java.awt.image.PixelGrabber;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -32,6 +40,7 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 import javax.swing.GrayFilter;
+import javax.swing.ImageIcon;
 
 public class ImageUtils {
 	
@@ -39,7 +48,7 @@ public class ImageUtils {
 	    return Toolkit.getDefaultToolkit().createImage(bufferedImage.getSource());
 	}
 	
-	public static BufferedImage toBufferedImage(Image image) {
+	public static BufferedImage toBufferedImage2(Image image) {
 		BufferedImage bufferedImage = null;
 		if (image != null) {
 			bufferedImage = new BufferedImage(image.getWidth(null),
@@ -48,16 +57,87 @@ public class ImageUtils {
 		}
 		return bufferedImage;
 	}
+	
+	// This method returns a buffered image with the contents of an image
+	public static BufferedImage toBufferedImage(Image image) {
+	    if (image instanceof BufferedImage) {
+	        return (BufferedImage)image;
+	    }
+
+	    // This code ensures that all the pixels in the image are loaded
+	    image = new ImageIcon(image).getImage();
+
+	    // Determine if the image has transparent pixels; for this method's
+	    // implementation, see Determining If an Image Has Transparent Pixels
+	    boolean hasAlpha = hasAlpha(image);
+
+	    // Create a buffered image with a format that's compatible with the screen
+	    BufferedImage bimage = null;
+	    GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+	    try {
+	        // Determine the type of transparency of the new buffered image
+	        int transparency = Transparency.OPAQUE;
+	        if (hasAlpha) {
+	            transparency = Transparency.BITMASK;
+	        }
+
+	        // Create the buffered image
+	        GraphicsDevice gs = ge.getDefaultScreenDevice();
+	        GraphicsConfiguration gc = gs.getDefaultConfiguration();
+	        bimage = gc.createCompatibleImage(
+	            image.getWidth(null), image.getHeight(null), transparency);
+	    } catch (HeadlessException e) {
+	        // The system does not have a screen
+	    }
+
+	    if (bimage == null) {
+	        // Create a buffered image using the default color model
+	        int type = BufferedImage.TYPE_INT_RGB;
+	        if (hasAlpha) {
+	            type = BufferedImage.TYPE_INT_ARGB;
+	        }
+	        bimage = new BufferedImage(image.getWidth(null), image.getHeight(null), type);
+	    }
+
+	    // Copy image to buffered image
+	    Graphics g = bimage.createGraphics();
+
+	    // Paint the image onto the buffered image
+	    g.drawImage(image, 0, 0, null);
+	    g.dispose();
+
+	    return bimage;
+	}
+	
+	// This method returns true if the specified image has transparent pixels
+	public static boolean hasAlpha(Image image) {
+	    // If buffered image, the color model is readily available
+	    if (image instanceof BufferedImage) {
+	        BufferedImage bimage = (BufferedImage)image;
+	        return bimage.getColorModel().hasAlpha();
+	    }
+
+	    // Use a pixel grabber to retrieve the image's color model;
+	    // grabbing a single pixel is usually sufficient
+	     PixelGrabber pg = new PixelGrabber(image, 0, 0, 1, 1, false);
+	    try {
+	        pg.grabPixels();
+	    } catch (InterruptedException e) {
+	    }
+
+	    // Get the image's color model
+	    ColorModel cm = pg.getColorModel();
+	    return cm.hasAlpha();
+	}
 
 	/**
 	 * Load anh tra ve buffred image
-	 * @param filename Duong dan file anh
+	 * @param fileName Duong dan file anh
 	 * @return Ket qua load anh
 	 */
-	public static BufferedImage load(String filename) {
-		File file = new File(filename);
-		BufferedImage bufferedImage = null;
-		Image image;
+	public static BufferedImage load(String fileName) {
+		File file = new File(fileName);
+		Image image = null;
 		try {
 			image = ImageIO.read(file);
 			if (image != null) {
@@ -66,7 +146,7 @@ public class ImageUtils {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return bufferedImage;
+		return null;
 	}
 
 	/**

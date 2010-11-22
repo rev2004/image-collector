@@ -38,6 +38,16 @@ public class Const {
     public static final int JUMP_LENGHT = 5;
     
     /**
+     * Độ giãn nở kích thước khung dò khuôn mặt
+     */
+    public static final int SCANNER_GROWTH = 10;
+    
+    /**
+     * Ngưỡng để xác định một khung hình có khả năng là khuôn mặt hay không
+     */
+    public static final double SCANNER_RATE_THRESHOLD = 0.7;
+    
+    /**
      * Luu duong dan file mask
      */
     public static final String MASK_IMAGE = System.getProperty("user.dir") + "/ref/imageStore/mask.jpg";
