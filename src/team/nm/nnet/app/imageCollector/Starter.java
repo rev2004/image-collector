@@ -1,7 +1,6 @@
 package team.nm.nnet.app.imageCollector;
 
 import sol.hawking.snatcher.core.Application;
-import team.nm.nnet.app.imageCollector.layout.Capture;
 import team.nm.nnet.app.imageCollector.layout.MainFrame;
 
 public class Starter {

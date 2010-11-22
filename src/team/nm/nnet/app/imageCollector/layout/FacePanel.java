@@ -1,9 +1,13 @@
 package team.nm.nnet.app.imageCollector.layout;
 
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
+
+import team.nm.nnet.core.Const;
+import team.nm.nnet.util.ImageUtils;
 
 public class FacePanel extends javax.swing.JPanel {
 
@@ -17,6 +21,11 @@ public class FacePanel extends javax.swing.JPanel {
     
     public void setFaceImage(Image faceImage) {
     	this.faceImage = faceImage;
+    	if((faceImage.getWidth(null) > Const.FACE_WIDTH) || (faceImage.getHeight(null)) > Const.FACE_HEIGHT) {
+    	    BufferedImage bufferedImage = ImageUtils.toBufferedImage(faceImage);
+            bufferedImage = ImageUtils.scale(bufferedImage, Const.FACE_WIDTH, Const.FACE_HEIGHT);
+            faceImage = ImageUtils.toImage(bufferedImage);
+        }
     	lblFaceView.setIcon(new ImageIcon(faceImage));
     }
     

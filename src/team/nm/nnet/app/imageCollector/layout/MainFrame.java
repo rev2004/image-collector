@@ -47,15 +47,6 @@ public class MainFrame extends javax.swing.JFrame {
         pnlFaces.add(facePanel);
         pnlFaces.updateUI();
 	}
-	
-	public void addFacesDemo() {
-		FacePanel fp1 = new FacePanel(pnlFaces, ImageUtils.toImage(ImageUtils.load("D:\\FindMyPic\\M.jpg")));
-		addFaceCandidates(fp1);
-		FacePanel fp2 = new FacePanel(pnlFaces, ImageUtils.toImage(ImageUtils.load("D:\\FindMyPic\\N.jpg")));
-		addFaceCandidates(fp2);
-		FacePanel fp3 = new FacePanel(pnlFaces, ImageUtils.toImage(ImageUtils.load("D:\\FindMyPic\\Master.jpg")));
-		addFaceCandidates(fp3);
-	}
 
     // construct form view
     private void initComponents() {
@@ -110,7 +101,7 @@ public class MainFrame extends javax.swing.JFrame {
         pnlFaces.setBackground(new java.awt.Color(255, 255, 255));
         pnlFaces.setLayout(new javax.swing.BoxLayout(pnlFaces, javax.swing.BoxLayout.PAGE_AXIS));
 
-        addFacesDemo();
+//        addFacesDemo();
 
         splFaces.setViewportView(pnlFaces);
 
@@ -304,7 +295,7 @@ public class MainFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }                                             
 
-    private void btnSysFileActionPerformed(java.awt.event.ActionEvent evt) {                                           
+    private void btnSysFileActionPerformed(java.awt.event.ActionEvent evt) {
     	final JFileChooser chooser = new JFileChooser(".");
 		ImageFilter imageFilter = new ImageFilter();
 		chooser.addChoosableFileFilter(imageFilter);
@@ -312,7 +303,7 @@ public class MainFrame extends javax.swing.JFrame {
 		chooser.setAccessory(preview);
 		chooser.addPropertyChangeListener(preview);
 		chooser.setName("Lấy ảnh mẫu");
-		int returnVal = chooser.showSaveDialog(null);
+		int returnVal = chooser.showOpenDialog(null);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File selectedFile = chooser.getSelectedFile();
 			if (imageFilter.accept(selectedFile)) {
@@ -345,16 +336,55 @@ public class MainFrame extends javax.swing.JFrame {
     }
     
     private void detectFaceCandidates() {
-    	BufferedImage bufferedImage = ImageUtils.toBufferedImage(showingImage);
-    	Matrix<Integer> yCrCbArr = ColorDetection.toYCbCr(bufferedImage);
-    	for(int i = 0, width = yCrCbArr.getWidth(); i < width; i += Const.JUMP_LENGHT) {
-    		if(i + Const.FACE_WIDTH < width) {
-	    		BufferedImage subBuff = bufferedImage.getSubimage(i, 0, Const.FACE_WIDTH, Const.FACE_HEIGHT);
-	    		FacePanel fp = new FacePanel(pnlFaces, ImageUtils.toImage(subBuff));
-	    		addFaceCandidates(fp);
-    		}
-    	}
-    	JOptionPane.showMessageDialog(this, "Change picture!");
+        pnlFaces.removeAll();
+        pnlFaces.updateUI();
+        new Thread(new Runnable() {
+            
+            @Override
+            public void run() {
+                BufferedImage bufferedImage = ImageUtils.toBufferedImage(showingImage);
+                
+                BufferedImage y2CBuff = ColorDetection.toYCbCr(bufferedImage);
+                lblImgView.setIcon(new javax.swing.ImageIcon(ImageUtils.toImage(y2CBuff)));
+                
+                Matrix<Integer> integralArr = ColorDetection.getIntegralMatrix(bufferedImage);
+                int detectorWidth = Const.FACE_WIDTH;
+                int detectorHeight = Const.FACE_HEIGHT;
+                int width = integralArr.getWidth();
+                int height = integralArr.getHeight();
+
+                do {
+                    for(int i = 0; i < width; i += Const.JUMP_LENGHT) {
+                        for(int j = 0; j < height; j += Const.JUMP_LENGHT) {
+                            if((i + detectorWidth < width) && (j + detectorHeight < height)) {
+                                int d = integralArr.getValue(i + detectorWidth, j + detectorHeight);
+                                int c = integralArr.getValue(i, j + detectorHeight);
+                                int b = integralArr.getValue(i, j + detectorWidth);
+                                int a = integralArr.getValue(i, j);
+                                float whitePixelSum = d - (b + c) + a;
+                                float rate = whitePixelSum / (detectorWidth * detectorHeight);
+System.out.println(String.format("sWidth=%d, sHeight=%d, pos[%d][%d]: d=%d, c=%d, b=%d, a=%d, wiSum=%f, rate=%f", 
+        detectorWidth, detectorHeight, i, j, d, c, b, a, whitePixelSum, rate));
+                                if(rate > Const.SCANNER_RATE_THRESHOLD) {
+                                    BufferedImage subBuff = bufferedImage.getSubimage(i, j, detectorWidth, detectorHeight);
+                                    FacePanel fp = new FacePanel(pnlFaces, ImageUtils.toImage(subBuff));
+                                    fp.setFaceName(String.valueOf(rate));
+                                    addFaceCandidates(fp);
+                                }
+                            }
+                        }
+                    }
+                    if((detectorWidth < width) && (detectorHeight < height)) {
+                        detectorWidth += Const.SCANNER_GROWTH;
+                        detectorHeight += Const.SCANNER_GROWTH;
+                    } else {
+                        break;
+                    }
+                } while((detectorWidth < width) && (detectorHeight < height));
+                System.out.println("Finished!");
+            }
+        }).start();
+    	
     }
 
     // Variables declaration - do not modify

@@ -36,6 +36,13 @@ public class Matrix<E> {
 	public E[][] getValue() {
 		return value;
 	}
+	
+	public E getValue(int row, int col) {
+	    if((row > width) || (col > height)) {
+	        return null;
+	    }
+	    return value[row][col];
+	}
 
 	public void setWidth(int width) {
 		this.width = width;
